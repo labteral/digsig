@@ -36,6 +36,9 @@ class PrivateKey:
             self.private_key, _, _ = pkcs12.load_key_and_certificates(input_file.read(),
                                                                       bytes(password, 'utf-8'))
 
+    def _load_pfx(self, filepath: str, password: str):
+        self._load_p12(filepath, password)
+
     def _load_json(self, filepath: str, password: str):
         private_key_dict = json.load(open(filepath, 'r'))
 
