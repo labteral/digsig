@@ -1,9 +1,14 @@
-# python-package
-Python Package Boilerplate
+# digsig
+
+## Install
+```bash
+pip install digsig
+```
 
 ## Usage
-```
-git clone https://github.com/brunneis/python-package
-cd python-package
-./rename.sh
+```python
+from digsig import PrivateKey
+
+private_key = PrivateKey('file.p12', 'p4ssw0rd')
+signature = private_key.sign("message to sign")
 ```
