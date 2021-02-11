@@ -3,15 +3,15 @@
 
 from setuptools import setup
 from setuptools import find_packages
-import package_name
+import digsig
 
 setup(
-    name='package_name',
-    version=package_name.__version__,
-    description='description_value',
-    url='url_value',
-    author='author_value',
-    author_email='email_value',
+    name='digsig',
+    version=digsig.__version__,
+    description='Digital signature toolkit for Python',
+    url='https://github.com/labteral/digsig',
+    author='Rodrigo Martínez Castaño',
+    author_email='rodrigo@martinez.gal',
     license='GNU General Public License v3 (GPLv3)',
     packages=find_packages(),
     zip_safe=False,
@@ -26,4 +26,4 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     python_requires=">=3.6",
-    install_requires=[''])  # Dependencies
+    install_requires=['cryptography==3.4.4'])
