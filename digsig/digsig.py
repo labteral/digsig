@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.serialization import pkcs12
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.exceptions import InvalidSignature
 from web3 import Web3
-from eth_account.messages import defunct_hash_message
+from eth_account.messages import encode_defunct
 from .crypto import sha256_str_to_bin
 
 
@@ -94,6 +94,6 @@ class PrivateKey:
         return signature
 
     def _sign_ethereum(self, text: str):
-        text_hash = defunct_hash_message(text=text)
-        signature = self._private_key.signHash(text_hash)['signature'].hex()[2:]
+        text_hash = encode_defunct(text=text)
+        signature = self._private_key.sign_message(text_hash)['signature'].hex()[2:]
         return signature
