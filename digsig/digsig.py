@@ -61,7 +61,7 @@ class PrivateKey:
         self.family = 'ethereum'
         web3 = Web3()
         private_key = web3.eth.account.decrypt(private_key_dict, password)
-        self._private_key = web3.eth.account.privateKeyToAccount(private_key)
+        self._private_key = web3.eth.account.from_key(private_key)
 
     def sign(self, text: str) -> str:
         sign_method = f'_sign_{self.family}'
