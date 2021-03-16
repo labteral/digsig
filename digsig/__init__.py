@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .digsig import *
+from . import *
 
-__version__ = '0.0.6b0'
+__version__ = '21.3.16.0'
