@@ -36,7 +36,7 @@ class PublicKeyAuto:
 
             else:
                 raise NotSupportedError
-            
+
             return public_key_class(
                 filepath=filepath,
                 mode=mode,
@@ -74,12 +74,33 @@ class PrivateKeyAuto:
             else:
                 raise NotSupportedError
 
-            return private_key_class(filepath=filepath,
-                                     password=password,
-                                     mode=mode,
-                                     key_format=key_format)
+            return private_key_class(
+                filepath=filepath,
+                password=password,
+                mode=mode,
+                key_format=key_format,
+            )
 
         if key is not None:
-            raise NotImplementedError
+            if mode is None or EcdsaModes is None:
+                raise ValueError
+
+            if mode in EcdsaModes.options:
+                private_key_class = EcdsaPrivateKey
+                if key_format not in EcdsaFormats.options:
+                    raise ValueError
+            elif mode in RsaPrivateKey.options:
+                private_key_class = RsaPrivateKey
+                if key_format not in EcdsaFormats.options:
+                    raise ValueError
+            else:
+                raise ValueError
+
+            return private_key_class(
+                key=key,
+                password=password,
+                mode=mode,
+                key_format=key_format,
+            )
 
         raise ValueError

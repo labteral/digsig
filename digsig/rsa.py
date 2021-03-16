@@ -155,9 +155,11 @@ class RsaPrivateKey(PrivateKeyInterface):
             Encoding.PEM,
             PublicFormat.SubjectPublicKeyInfo,
         )
-        self._public_key_object = RsaPublicKey(mode=self._mode,
-                                               key_format=RsaFormats.P12,
-                                               key=public_key_bytes)
+        self._public_key_object = RsaPublicKey(
+            mode=self._mode,
+            key_format=RsaFormats.P12,
+            key=public_key_bytes,
+        )
 
     def _generate_private_key(self, key_size: int):
         self._private_key_object = rsa.generate_private_key(public_exponent=65537,
