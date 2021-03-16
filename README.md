@@ -1,4 +1,4 @@
-<center><h1>DigSig</h1></center>
+# DigSig
 
 The private key detection is automatic with the class `PrivateKeyAuto`. It currently works with RSA (`X.509` with `PKCS#12` files: `.p12`, or `.pfx`) and with ECDSA (Ethereum account exported in a `JSON` file).
 
