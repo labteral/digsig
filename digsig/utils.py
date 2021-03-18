@@ -6,7 +6,6 @@ from .hashing import hash_message, HashFunctions
 
 class Options:
     @classmethod
-    @property
     def options(cls):
         return set([
             getattr(cls, model_type)

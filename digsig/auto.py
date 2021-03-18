@@ -85,13 +85,13 @@ class PrivateKeyAuto:
             if mode is None or EcdsaModes is None:
                 raise ValueError
 
-            if mode in EcdsaModes.options:
+            if mode in EcdsaModes.options():
                 private_key_class = EcdsaPrivateKey
-                if key_format not in EcdsaFormats.options:
+                if key_format not in EcdsaFormats.options():
                     raise ValueError
-            elif mode in RsaPrivateKey.options:
+            elif mode in RsaPrivateKey.options():
                 private_key_class = RsaPrivateKey
-                if key_format not in EcdsaFormats.options:
+                if key_format not in EcdsaFormats.options():
                     raise ValueError
             else:
                 raise ValueError

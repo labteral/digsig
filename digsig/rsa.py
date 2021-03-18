@@ -42,11 +42,11 @@ class RsaPublicKey(PublicKeyInterface):
         # self._public_bytes = None
         self._public_key_object = None
 
-        if mode not in RsaModes.options:
+        if mode not in RsaModes.options():
             raise ValueError
         self._mode = mode
 
-        if key_format not in RsaFormats.options:
+        if key_format not in RsaFormats.options():
             raise ValueError
         self._key_format = key_format
 
@@ -107,7 +107,7 @@ class RsaPrivateKey(PrivateKeyInterface):
         self._private_key_object = None
         self._public_key_object = None
 
-        if mode not in RsaModes.options:
+        if mode not in RsaModes.options():
             raise ValueError
         self._mode = mode
 
@@ -117,7 +117,7 @@ class RsaPrivateKey(PrivateKeyInterface):
             self._generate_private_key(key_size)
             return
 
-        if key_format not in RsaFormats.options:
+        if key_format not in RsaFormats.options():
             raise ValueError
         self._key_format = key_format
 

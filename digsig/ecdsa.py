@@ -43,10 +43,10 @@ class EcdsaPublicKey(PublicKeyInterface):
         self._public_bytes = None
         self._public_key_object = None
 
-        if mode not in EcdsaModes.options:
+        if mode not in EcdsaModes.options():
             raise ValueError
 
-        if key_format not in EcdsaFormats.options:
+        if key_format not in EcdsaFormats.options():
             raise ValueError
 
         self._mode = mode
@@ -133,7 +133,7 @@ class EcdsaPrivateKey(PrivateKeyInterface):
         self._private_key_object = None
         self._public_key_object = None
 
-        if mode not in EcdsaModes.options:
+        if mode not in EcdsaModes.options():
             raise ValueError
         self._mode = mode
         self._eliptic_curve = getattr(ec, self._mode.split('_')[0])()
@@ -142,7 +142,7 @@ class EcdsaPrivateKey(PrivateKeyInterface):
             self._generate_private_value()
             return
 
-        if key_format not in EcdsaFormats.options:
+        if key_format not in EcdsaFormats.options():
             raise ValueError
         self._key_format = key_format
 
