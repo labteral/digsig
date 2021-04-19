@@ -89,7 +89,7 @@ class PrivateKeyAuto:
                 private_key_class = EcdsaPrivateKey
                 if key_format not in EcdsaFormats.options():
                     raise ValueError
-            elif mode in RsaPrivateKey.options():
+            elif mode in RsaModes.options():
                 private_key_class = RsaPrivateKey
                 if key_format not in EcdsaFormats.options():
                     raise ValueError
