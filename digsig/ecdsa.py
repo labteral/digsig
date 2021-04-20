@@ -188,13 +188,8 @@ class EcdsaPrivateKey(PrivateKeyInterface):
         return signature
 
     def _generate_private_value(self):
-        if self._mode == EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM:
-            private_value = hash_message(os.urandom(32),
-                                         HashFunctions.KECCAK_256)
-            self._private_value = big_endian_to_int(private_value)
-        else:
-            self._private_value = \
-                ec.generate_private_key(self._eliptic_curve).private_numbers().private_value
+        self._private_value = ec.generate_private_key(
+            self._eliptic_curve).private_numbers().private_value
         self._load_private_key()
 
     def _load_private_value(self, key, password: str = None):
