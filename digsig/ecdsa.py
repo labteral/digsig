@@ -98,7 +98,7 @@ class EcdsaPublicKey(PublicKeyInterface):
             message_hash = hash_message(message, hash_function)
             try:
                 self._public_key_object.verify(
-                    signature, message,
+                    signature, message_hash,
                     ec.ECDSA(getattr(hashes, hash_function.upper())()))
             except cryptography_exceptions.InvalidSignature:
                 raise InvalidSignatureError
@@ -161,8 +161,7 @@ class EcdsaPrivateKey(PrivateKeyInterface):
     def public_key(self):
         return self._public_key_object
 
-    @property
-    def ethereum_account(self, password: str = None):
+    def get_ethereum_account(self, password: str = None):
         if password is None:
             password = ''
         return EthereumAccount.encrypt(self._private_value, password)
