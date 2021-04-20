@@ -26,4 +26,4 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     python_requires=">=3.6",
-    install_requires=['cryptography==3.4.4', 'web3==5.16.0'])
+    install_requires=['cryptography==3.4.4', 'web3<6.0.0'])

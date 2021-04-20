@@ -82,8 +82,10 @@ class EcdsaPublicKey(PublicKeyInterface):
         if self._mode == EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM:
             message_hash = defunct_hash_message(message)
             try:
-                signature_bytes_standard = to_standard_signature_bytes(signature)
-                signature_obj = EthereumKeys.Signature(signature_bytes=signature_bytes_standard)
+                signature_bytes_standard = to_standard_signature_bytes(
+                    signature)
+                signature_obj = EthereumKeys.Signature(
+                    signature_bytes=signature_bytes_standard)
                 obtained_public_value = signature_obj.recover_public_key_from_msg_hash(
                     message_hash).to_bytes()
                 if obtained_public_value != self._public_bytes:
@@ -95,8 +97,9 @@ class EcdsaPublicKey(PublicKeyInterface):
             hash_function = '_'.join(self._mode.split('_')[1:]).lower()
             message_hash = hash_message(message, hash_function)
             try:
-                self._public_key_object.verify(signature, message,
-                                               ec.ECDSA(getattr(hashes, hash_function.upper())()))
+                self._public_key_object.verify(
+                    signature, message,
+                    ec.ECDSA(getattr(hashes, hash_function.upper())()))
             except cryptography_exceptions.InvalidSignature:
                 raise InvalidSignatureError
 
@@ -112,7 +115,9 @@ class EcdsaPublicKey(PublicKeyInterface):
     def _load_public_key(self):
         if self._mode != EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM:
             self._public_key_object = ec.EllipticCurvePublicKey.from_encoded_point(
-                self._eliptic_curve, self._public_bytes)
+                self._eliptic_curve,
+                b'\x04' + self._public_bytes,
+            )
 
         self._public_value = {
             'x': big_endian_to_int(self._public_bytes[:32]),
@@ -156,6 +161,12 @@ class EcdsaPrivateKey(PrivateKeyInterface):
     def public_key(self):
         return self._public_key_object
 
+    @property
+    def ethereum_account(self, password: str = None):
+        if password is None:
+            password = ''
+        return EthereumAccount.encrypt(self._private_value, password)
+
     def sign(self, message) -> bytes:
         if isinstance(message, str):
             message = bytes(message, 'utf-8')
@@ -165,7 +176,8 @@ class EcdsaPrivateKey(PrivateKeyInterface):
 
         if self._mode == EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM:
             message_hash = defunct_hash_message(message)
-            (_, _, _, signature) = sign_message_hash(self._private_key_object, message_hash)
+            (_, _, _, signature) = sign_message_hash(self._private_key_object,
+                                                     message_hash)
 
         else:
             hash_function = '_'.join(self._mode.split('_')[1:]).lower()
@@ -178,11 +190,12 @@ class EcdsaPrivateKey(PrivateKeyInterface):
 
     def _generate_private_value(self):
         if self._mode == EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM:
-            private_value = hash_message(os.urandom(32), HashFunctions.KECCAK_256)
+            private_value = hash_message(os.urandom(32),
+                                         HashFunctions.KECCAK_256)
             self._private_value = big_endian_to_int(private_value)
         else:
-            self._private_value = ec.generate_private_key(
-                self._eliptic_curve).private_numbers().private_value
+            self._private_value = \
+                ec.generate_private_key(self._eliptic_curve).private_numbers().private_value
         self._load_private_key()
 
     def _load_private_value(self, key, password: str = None):
@@ -211,16 +224,18 @@ class EcdsaPrivateKey(PrivateKeyInterface):
                 mode=self._mode,
                 key_format=EcdsaFormats.RAW_VALUE,
             )
-            return
-
-        self._private_key_object = ec.derive_private_key(self._private_value, self._eliptic_curve)
-        public_numbers = self._private_key_object.public_key().public_numbers()
-        public_bytes = int_to_big_endian(public_numbers.x) + int_to_big_endian(public_numbers.y)
-        self._public_key_object = EcdsaPublicKey(
-            key=public_bytes,
-            mode=self._mode,
-            key_format=EcdsaFormats.RAW_VALUE,
-        )
+        else:
+            self._private_key_object = ec.derive_private_key(
+                self._private_value, self._eliptic_curve)
+            public_numbers = self._private_key_object.public_key(
+            ).public_numbers()
+            public_bytes = int_to_big_endian(public_numbers.x) \
+                + int_to_big_endian(public_numbers.y)
+            self._public_key_object = EcdsaPublicKey(
+                key=public_bytes,
+                mode=self._mode,
+                key_format=EcdsaFormats.RAW_VALUE,
+            )
 
     def _load_private_key_from_file(self, filepath: str, password: str):
         with open(filepath, 'rb') as input_file:
