@@ -1,2 +1,0 @@
-cryptography==3.4.4
-web3==5.16.0
