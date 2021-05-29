@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .hashing import HashFunctions, hash_message
+from build.lib.digsig.ecdsa import EcdsaFormats
+from .hashing import hash_message
 from .digsig import PublicKeyInterface, PrivateKeyInterface
 from .errors import InvalidSignatureError
 from .utils import Options
-import json
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import (
-    pkcs7,
     pkcs12,
+    load_pem_private_key,
+    load_der_private_key,
     load_pem_public_key,
     load_der_public_key,
     Encoding,
+    PrivateFormat,
     PublicFormat,
+    NoEncryption,
 )
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography import exceptions as cryptography_exceptions
@@ -23,7 +26,7 @@ class RsaFormats(Options):
     P12 = 'P12'
     PFX = 'PFX'
     PEM = 'PEM'
-    CER = 'CER'
+    DER = 'DER'
 
 
 class RsaModes(Options):
@@ -39,23 +42,33 @@ class RsaPublicKey(PublicKeyInterface):
         key_format: str = None,
         key=None,
     ):
-        # self._public_bytes = None
         self._public_key_object = None
 
         if mode not in RsaModes.options():
             raise ValueError
         self._mode = mode
 
+        if key_format is None:
+            key_format = RsaFormats.PEM
         if key_format not in RsaFormats.options():
             raise ValueError
         self._key_format = key_format
 
         if key is not None:
+            if isinstance(key, str):
+                key = bytes(key, 'ascii')
             self._load_public_key(key)
         elif filepath is not None:
             self._load_public_key_from_file(filepath)
         else:
             raise ValueError
+
+    @property
+    def public_pem(self):
+        return self._public_key_object.public_bytes(
+            encoding=Encoding.PEM,
+            format=PublicFormat.SubjectPublicKeyInfo,
+        ).decode('ascii')
 
     def verify(self, message, signature):
         if isinstance(message, str):
@@ -83,10 +96,14 @@ class RsaPublicKey(PublicKeyInterface):
             raise InvalidSignatureError
 
     def _load_public_key(self, key: bytes):
-        try:
+        if self._key_format == RsaFormats.PEM:
             self._public_key_object = load_pem_public_key(key)
-        except ValueError:
+
+        elif self._key_format == RsaFormats.DER:
             self._public_key_object = load_der_public_key(key)
+
+        else:
+            raise ValueError
 
     def _load_public_key_from_file(self, filepath: str):
         with open(filepath, 'rb') as input_file:
@@ -117,11 +134,15 @@ class RsaPrivateKey(PrivateKeyInterface):
             self._generate_private_key(key_size)
             return
 
+        if key_format is None:
+            key_format = RsaFormats.P12
         if key_format not in RsaFormats.options():
             raise ValueError
         self._key_format = key_format
 
         if key is not None:
+            if isinstance(key, str):
+                key = bytes(key, 'ascii')
             self._load_private_key(key, password)
 
         if filepath is not None:
@@ -130,6 +151,14 @@ class RsaPrivateKey(PrivateKeyInterface):
     @property
     def public_key(self):
         return self._public_key_object
+
+    @property
+    def private_pem(self):
+        return self._private_key_object.private_bytes(
+            encoding=Encoding.PEM,
+            format=PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=NoEncryption(),
+        ).decode('ascii')
 
     def sign(self, message) -> str:
         if isinstance(message, str):
@@ -157,24 +186,34 @@ class RsaPrivateKey(PrivateKeyInterface):
         )
         self._public_key_object = RsaPublicKey(
             mode=self._mode,
-            key_format=RsaFormats.P12,
+            key_format=RsaFormats.PEM,
             key=public_key_bytes,
         )
 
     def _generate_private_key(self, key_size: int):
-        self._private_key_object = rsa.generate_private_key(public_exponent=65537,
-                                                            key_size=key_size)
+        self._private_key_object = rsa.generate_private_key(
+            public_exponent=65537, key_size=key_size)
         self._set_public_key_object()
 
     def _load_private_key(self, key, password: str = None):
+        if isinstance(password, str):
+            password = bytes(password, 'utf-8')
+
         if self._key_format in [RsaFormats.P12, RsaFormats.PFX]:
-            if isinstance(password, str):
-                password = bytes(password, 'utf-8')
             # private_key, certificate, additional_certificates
-            self._private_key_object, _, _ = pkcs12.load_key_and_certificates(key, password)
-            self._set_public_key_object()
+            self._private_key_object, _, _ = pkcs12.load_key_and_certificates(
+                key, password)
+
+        elif self._key_format == RsaFormats.PEM:
+            self._private_key_object = load_pem_private_key(key, password)
+
+        elif self._key_format == RsaFormats.DER:
+            self._private_key_object = load_der_private_key(key, password)
+
         else:
             raise ValueError
+
+        self._set_public_key_object()
 
     def _load_private_key_from_file(self, filepath: str, password: str):
         with open(filepath, 'rb') as input_file:

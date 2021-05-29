@@ -8,9 +8,7 @@ from .utils import (
     Options,
     big_endian_to_int,
     int_to_big_endian,
-    get_extension,
 )
-from enum import Enum
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography import exceptions as cryptography_exceptions
 from eth_account import Account as EthereumAccount
@@ -18,8 +16,8 @@ from eth_account.messages import defunct_hash_message
 from eth_account._utils.signing import sign_message_hash, to_standard_signature_bytes
 from eth_keys import keys as EthereumKeys, exceptions as eth_keys_exceptions
 import json
-import os
 from cryptography.hazmat.primitives import hashes
+import base64
 
 
 class EcdsaFormats(Options):
@@ -63,6 +61,10 @@ class EcdsaPublicKey(PublicKeyInterface):
     @property
     def public_bytes(self):
         return self._public_bytes
+
+    @property
+    def public_base64(self):
+        return base64.b64encode(self.public_bytes).decode('ascii')
 
     @property
     def public_value(self):
@@ -147,6 +149,8 @@ class EcdsaPrivateKey(PrivateKeyInterface):
             self._generate_private_value()
             return
 
+        if key_format is None:
+            key_format = EcdsaFormats.RAW_VALUE
         if key_format not in EcdsaFormats.options():
             raise ValueError
         self._key_format = key_format
@@ -161,9 +165,24 @@ class EcdsaPrivateKey(PrivateKeyInterface):
     def public_key(self):
         return self._public_key_object
 
+    @property
+    def private_value(self):
+        return self._private_value
+
+    @property
+    def private_bytes(self):
+        return int_to_big_endian(self.private_value)
+
+    @property
+    def private_value_base64(self):
+        return base64.b64encode(self.private_bytes).decode('ascii')
+
+    @property
+    def private_value_hex(self):
+        return self.private_bytes.hex()
+
     def get_ethereum_account(self, password: str = None):
-        if password is None:
-            password = ''
+        password = password if password is not None else ''
         return EthereumAccount.encrypt(self._private_value, password)
 
     def sign(self, message) -> bytes:
@@ -199,10 +218,10 @@ class EcdsaPrivateKey(PrivateKeyInterface):
             private_value = bytes(EthereumAccount.decrypt(key, password))
             self._private_value = big_endian_to_int(private_value)
         elif self._key_format == EcdsaFormats.RAW_VALUE:
-            if isinstance(key, str):
-                key = bytes.fromhex(key)
             if isinstance(key, bytes):
                 key = big_endian_to_int(key)
+            if not isinstance(key, int):
+                raise ValueError(f'{type(key)} is not int')
             self._private_value = key
         else:
             raise ValueError

@@ -17,7 +17,7 @@ DigSig
     <a href="https://www.buymeacoffee.com/brunneis" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="35px"></a>
 </p>
 
-The private key detection is automatic with the class `PrivateKeyAuto`. It currently works with RSA (`X.509` with `PKCS#12` files: `.p12`, or `.pfx`) and with ECDSA (Ethereum account exported in a `JSON` file).
+The private key detection is automatic with the class `PrivateKey`. It currently works with RSA (`X.509` with `PKCS#12` files: `.p12`, or `.pfx`) and with ECDSA (Ethereum account exported in a `JSON` file).
 
 ## Install
 ```bash
@@ -28,20 +28,20 @@ pip install digsig
 ## Automatic detection
 RSA (X.509)
 ```python
-from digsig.auto import PrivateKeyAuto, PublicKeyAuto
+from digsig import PrivateKey, PublicKey
 
-private_key = PrivateKeyAuto.get_instance('fnmt.p12', 'p4ssw0rd')
+private_key = PrivateKey.get_instance('fnmt.p12', 'p4ssw0rd')
 signature = private_key.sign('message')
 
 # public_key = private_key.public_key
-public_key = PublicKeyAuto.get_instance('fnmt.pem')
+public_key = PublicKey.get_instance('fnmt.pem')
 ```
 
 ECDSA (Ethereum)
 ```python
-from digsig.auto import PrivateKeyAuto, PublicKeyAuto
+from digsig import PrivateKey, PublicKey
 
-private_key = PrivateKeyAuto.get_instance('ethereum.json', 'p4ssw0rd')
+private_key = PrivateKey.get_instance('ethereum.json', 'p4ssw0rd')
 
 signature = private_key.sign('message')
 
@@ -50,7 +50,7 @@ public_key = private_key.public_key
 
 ## RSA
 ```python
-from digsig.rsa import RsaPrivateKey, RsaModes, RsaFormats
+from digsig import RsaPrivateKey, RsaModes, RsaFormats
 
 private_key = RsaPrivateKey('fnmt.p12', 'p4ssw0rd', mode=RsaModes.PSS_MGF1_SHA3_256)
 signature = private_key.sign('message')
@@ -61,7 +61,7 @@ public_key = RsaPublicKey('fnmt.pem', mode=RsaModes.PSS_MGF1_SHA3_256)
 
 ## ECDSA
 ```python
-from digsig.ecdsa import EcdsaPrivateKey, EcdsaModes
+from digsig import EcdsaPrivateKey, EcdsaModes
 
 private_key = EcdsaPrivateKey('account.json', 'p4ssw0rd', mode=EcdsaModes.SECP256K1_SHA3_256)
 signature = private_key.sign('message')

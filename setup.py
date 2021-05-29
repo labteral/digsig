@@ -25,4 +25,4 @@ setup(name='digsig',
           "Topic :: Software Development :: Libraries :: Python Modules",
       ],
       python_requires=">=3.6",
-      install_requires=['cryptography==3.4.4', 'web3>=5.19.0, <6.0.0'])
+      install_requires=['cryptography~=3.4.4', 'eth-account>=0.5.4, <1.0.0'])

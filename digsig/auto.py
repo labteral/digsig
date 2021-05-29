@@ -17,7 +17,7 @@ from .utils import get_extension
 from .errors import NotSupportedError
 
 
-class PublicKeyAuto:
+class PublicKey:
     @staticmethod
     def get_instance(
         filepath: str = None,
@@ -50,7 +50,7 @@ class PublicKeyAuto:
         raise ValueError
 
 
-class PrivateKeyAuto:
+class PrivateKey:
     @staticmethod
     def get_instance(
         filepath: str = None,
