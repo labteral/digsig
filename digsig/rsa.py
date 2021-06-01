@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from build.lib.digsig.ecdsa import EcdsaFormats
 from .hashing import hash_message
 from .digsig import PublicKeyInterface, PrivateKeyInterface
 from .errors import InvalidSignatureError

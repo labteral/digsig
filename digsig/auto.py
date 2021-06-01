@@ -49,6 +49,9 @@ class PublicKey:
 
         raise ValueError
 
+# Backwards compatible
+PublicKeyAuto = PublicKey
+
 
 class PrivateKey:
     @staticmethod
@@ -91,7 +94,7 @@ class PrivateKey:
                     raise ValueError
             elif mode in RsaModes.options():
                 private_key_class = RsaPrivateKey
-                if key_format not in EcdsaFormats.options():
+                if key_format not in RsaFormats.options():
                     raise ValueError
             else:
                 raise ValueError
@@ -104,3 +107,6 @@ class PrivateKey:
             )
 
         raise ValueError
+
+# Backwards compatible
+PrivateKeyAuto = PrivateKey
