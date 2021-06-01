@@ -21,7 +21,6 @@ class PublicKey:
     @staticmethod
     def get_instance(
         filepath: str = None,
-        password: str = None,
         mode: str = None,
         key_format: str = None,
         key=None,
