@@ -80,11 +80,40 @@ except InvalidSignatureError:
 ```
 
 # Generate keys
-> To-Do
+## RSA
+```python
+from digsig import RsaPrivateKey, RsaModes
+private_key = RsaPrivateKey(mode=RsaModes.PSS_MGF1_SHA256)
+public_key = private_key.public_key
+```
+
+## ECDSA
+```python
+from digsig import EcdsaPrivateKey, EcdsaModes
+private_key = EcdsaPrivateKey(mode=EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM)
+public_key = private_key.public_key
+```
 
 # Export keys
-> To-Do
+## RSA
+```python
+private_pem = private_key.private_pem
+public_pem = private_key.public_key.public_pem
+```
 
+## ECDSA
+```python
+private_value = private_key.private_value
+private_value_bytes = private_key.private_value_bytes
+private_value_hex = private_key.private_value_hex
+private_value_base64 = private_key.private_value_base64
+ethereum_keystore = private_key.get_ethereum_account()
+
+public_value = private_key.public_key.public_value
+public_bytes = private_key.public_key.public_bytes
+public_base64 = private_key.public_key.public_base64
+ethereum_address = private_key.public_key.ethereum_address
+```
 # Supported modes
 ## RSA
 > To-Do
