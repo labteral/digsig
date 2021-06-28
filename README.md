@@ -83,6 +83,7 @@ except InvalidSignatureError:
 ## RSA
 ```python
 from digsig import RsaPrivateKey, RsaModes
+
 private_key = RsaPrivateKey(mode=RsaModes.PSS_MGF1_SHA256)
 public_key = private_key.public_key
 ```
@@ -90,6 +91,7 @@ public_key = private_key.public_key
 ## ECDSA
 ```python
 from digsig import EcdsaPrivateKey, EcdsaModes
+
 private_key = EcdsaPrivateKey(mode=EcdsaModes.SECP256K1_KECCAK_256_ETHEREUM)
 public_key = private_key.public_key
 ```
