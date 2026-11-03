@@ -19,6 +19,7 @@ from cryptography.hazmat.primitives.serialization import (
 )
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography import exceptions as cryptography_exceptions
+from cryptography import x509
 
 
 class RsaFormats(Options):
@@ -26,6 +27,7 @@ class RsaFormats(Options):
     PFX = 'PFX'
     PEM = 'PEM'
     DER = 'DER'
+    CER = 'CER'
 
 
 class RsaModes(Options):
@@ -101,8 +103,14 @@ class RsaPublicKey(PublicKeyInterface):
         elif self._key_format == RsaFormats.DER:
             self._public_key_object = load_der_public_key(key)
 
+        elif self._key_format == RsaFormats.CER:
+            loader = x509.load_pem_x509_certificate if key.lstrip().startswith(b'-----BEGIN') else x509.load_der_x509_certificate
+            self._public_key_object = loader(key).public_key()
+
         else:
             raise ValueError
+        if not isinstance(self._public_key_object, rsa.RSAPublicKey):
+            raise ValueError('Expected an RSA public key')
 
     def _load_public_key_from_file(self, filepath: str):
         with open(filepath, 'rb') as input_file:

@@ -1,0 +1,5 @@
+graft digsig
+include install.sh upload.sh requirements-dev.txt
+recursive-include tests test_*.py
+global-exclude *.py[cod] .env .env.* *.pem *.key *.p12 *.pfx
+global-exclude *.[mM][dD] *.[mM][aA][rR][kK][dD][oO][wW][nN] *.[mM][dD][oO][wW][nN] [Rr][Ee][Aa][Dd][Mm][Ee]*
